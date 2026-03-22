@@ -38,7 +38,7 @@ pipeline {
             steps {
                 dir('main') {
                     // -auto-approve tells Terraform not to wait for you to type "yes"
-                    sh 'terraform apply -auto-approve tfplan'
+                    sh 'terraform destroy -auto-approve'
                 }
             }
         }
