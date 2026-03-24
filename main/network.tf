@@ -32,7 +32,7 @@ resource "aws_subnet" "private_subnet" {
   }
 }
 
-# 4. Internet Gateway (the door for our VPC)
+# 4. Internet Gateway (the door for our VPC) GATEWAY FOR PUBLIC INTERNET
 
 resource "aws_internet_gateway" "andrei_igw" {
   vpc_id = aws_vpc.andrei_vpc.id
@@ -63,4 +63,43 @@ resource "aws_route_table" "public_route_table" {
 resource "aws_route_table_association" "public_assoc" {
   subnet_id = aws_subnet.public_subnet.id
   route_table_id = aws_route_table.public_route_table.id
+}
+
+# 7. We need an Elastic IP ( Permanent IP Adrees ) for DB -> Internet communication
+
+resource "awp_eip" "nat_eip" {
+  domain = "vpc"
+}
+
+# 8. NAT GATEWAY ( DB -> Internet is allowed , but DB <-- Internet is not allowed) GATEWAY FOR PRIVATE INTERNET
+
+resource "aws_nat_gateway" "andrei_nat" {
+  allocation_id = aws_eip.nat_eip.id # That elastic IP
+  subnet_id = aws_subnet.public_subnet.id #Public subnet is connected with the Internet GateWay, so this is the line that make DB-->Internet to be allowed
+
+  tags = {
+    Name = "Andrei-NAT-Gateway"
+  }
+}
+
+# 9. Route Table
+
+resource "aws_route_table" "private_route_table" {
+  vpc_id = aws_vpc.andrei_vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.andrei_nat.id 
+  }
+
+  tags = {
+    Name = "Andrei-Private-RouteTable"
+  }
+} 
+
+# 10. Connecting Route Table with Private Subnet
+
+resource "aws_route_table_association" "private_assoc" {
+  subnet_id = aws_subnet.private_subnet.id
+  route_table_id = aws_route_table.private_route_table.id
 }
