@@ -40,16 +40,20 @@ An automated, enterprise-grade cloud networking deployment engine. This project 
 
 ```text
 devops-vpc/
-├── Jenkinsfile_bootstrap    # CI/CD Pipeline specifically for the backend state setup
-├── main/                    # Core VPC Infrastructure Deployment
-│   ├── Jenkinsfile          # CI/CD Pipeline specifically for the VPC (Apply/Destroy choices)
-│   ├── main.tf              # VPC, Subnets, IGW, Route Tables
-│   ├── variables.tf         # Dynamic input parameters (CIDR blocks, AZs)
-│   └── outputs.tf           # Exported VPC IDs and configurations
-└── bootstrap/               # S3 Remote State Dependencies Setup
-    ├── main.tf              # S3 bucket and DynamoDB lock configurations
-    ├── variables.tf         # Backend naming and tagging inputs
-    └── outputs.tf           # Exported S3 bucket names and ARNs
+├── bootstrap/                 # S3 Infrastructure
+│   ├── .terraform.lock.hcl
+│   ├── main.tf
+│   └── providers.tf
+├── main/                      # Core VPC Infrastructure
+│   ├── .terraform.lock.hcl
+│   ├── main.tf
+│   ├── network.tf
+│   ├── outputs.tf
+│   ├── providers.tf
+│   └── variables.tf
+├── .gitignore
+├── Jenkinsfile_bootstrap      # Pipeline for state infrastructure
+└── Jenkinsfile_main           # Pipeline for VPC infrastructure
 ```
 <h3>
   <span style="color: #BC13FE;">🧠 Code Review & Complexity</span><br>
